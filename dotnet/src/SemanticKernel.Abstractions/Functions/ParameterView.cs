@@ -19,3 +19,4 @@ public sealed record ParameterView(
     string? DefaultValue = null,
     ParameterViewType? Type = null,
     bool? IsRequired = null);
+//TODO: Add support for a closed list (enum) that can be used when converting to OpenAIFunction
