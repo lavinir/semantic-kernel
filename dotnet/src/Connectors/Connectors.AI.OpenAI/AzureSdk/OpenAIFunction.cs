@@ -2,6 +2,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using Azure.AI.OpenAI;
 using Microsoft.SemanticKernel.Text;
 
@@ -31,6 +33,11 @@ public class OpenAIFunctionParameter
     /// Whether the parameter is required or not.
     /// </summary>
     public bool IsRequired { get; set; } = false;
+
+    /// <summary>
+    /// An optional set of closed values indicating the valid options for this parameter.
+    /// </summary>
+    public IEnumerable<object>? Enum { get; set; } = null;
 }
 
 /// <summary>
@@ -88,6 +95,7 @@ public class OpenAIFunction
                 {
                     type = param.Type,
                     description = param.Description,
+                    @enum = param.Enum,
                 });
 
             if (param.IsRequired)
@@ -105,7 +113,17 @@ public class OpenAIFunction
                 type = "object",
                 properties = paramProperties,
                 required = requiredParams,
-            }),
+            }, s_options),
         };
     }
+
+    #region private ================================================================================
+
+    private static readonly JsonSerializerOptions s_options = new()
+    {
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+    };
+
+    #endregion
 }
