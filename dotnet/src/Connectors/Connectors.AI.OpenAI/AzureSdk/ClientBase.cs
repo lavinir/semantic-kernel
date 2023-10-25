@@ -391,7 +391,13 @@ public abstract class ClientBase
         foreach (var message in chatHistory)
         {
             var validRole = GetValidChatRole(message.Role);
-            options.Messages.Add(new ChatMessage(validRole, message.Content));
+            var chatMsg = new ChatMessage(validRole, message.Content);
+            if (!message.Name.IsNullOrEmpty())
+            {
+                chatMsg.Name = message.Name;
+            }
+
+            options.Messages.Add(chatMsg);
         }
 
         return options;
@@ -403,6 +409,7 @@ public abstract class ClientBase
 
         if (validRole != ChatRole.User &&
             validRole != ChatRole.System &&
+            validRole != ChatRole.Function &&
             validRole != ChatRole.Assistant)
         {
             throw new ArgumentException($"Invalid chat message author role: {role}");

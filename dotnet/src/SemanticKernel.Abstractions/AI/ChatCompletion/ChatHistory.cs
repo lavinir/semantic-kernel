@@ -34,6 +34,20 @@ public class ChatHistory : List<ChatMessageBase>
     }
 
     /// <summary>
+    /// Add a message to the chat history
+    /// </summary>
+    /// <param name="authorRole">Role of the message author</param>
+    /// <param name="content">Message content</param>
+    /// <param name="name">The name of the author of this message</param>
+    public void AddMessage(AuthorRole authorRole, string content, string name)
+    {
+        this.Add(new ChatMessage(authorRole, content)
+        {
+            Name = name
+        });
+    }
+
+    /// <summary>
     /// Insert a message into the chat history
     /// </summary>
     /// <param name="index">Index of the message to insert</param>
@@ -70,4 +84,15 @@ public class ChatHistory : List<ChatMessageBase>
     {
         this.AddMessage(AuthorRole.System, content);
     }
+
+    /// <summary>
+    /// Add a function message to the chat history
+    /// </summary>
+    /// <param name="content">Message content</param>
+    /// <param name="functionName">Fully qualified name of the function that returned `content`</param>
+    public void AddFunctionMessage(string content, string functionName)
+    {
+        this.AddMessage(AuthorRole.Function, content, functionName);
+    }
+
 }

@@ -65,8 +65,7 @@ public class OpenAIFunction
     /// separated by the value of <see cref="NameSeparator"/>.
     /// If there is no plugin name, this is the same as the function name.
     /// </summary>
-    public string FullyQualifiedName =>
-        this.PluginName.IsNullOrEmpty() ? this.FunctionName : string.Join(NameSeparator, this.PluginName, this.FunctionName);
+    public string FullyQualifiedName => BuildFullyQualifiedName(this.PluginName, this.FunctionName);
 
     /// <summary>
     /// Description of the function
@@ -77,6 +76,17 @@ public class OpenAIFunction
     /// List of parameters for the function
     /// </summary>
     public IList<OpenAIFunctionParameter> Parameters { get; set; } = new List<OpenAIFunctionParameter>();
+
+    /// <summary>
+    /// Builds the Fully qualified name of a function given a function name and the name of the plugin it belongs to.
+    /// </summary>
+    /// <param name="pluginName">The plugin name</param>
+    /// <param name="functionName">The function name</param>
+    /// <returns></returns>
+    public static string BuildFullyQualifiedName(string pluginName, string functionName)
+    {
+        return pluginName.IsNullOrEmpty() ? functionName : string.Join(NameSeparator, pluginName, functionName);
+    }
 
     /// <summary>
     /// Converts the <see cref="OpenAIFunction"/> to OpenAI's <see cref="FunctionDefinition"/>.

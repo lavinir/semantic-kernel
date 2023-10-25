@@ -112,7 +112,7 @@ public static class Example59_OpenAIFunctionCalling
                     Console.WriteLine(resultMessage);
 
                     // Add the function result to chat history
-                    chatHistory.AddAssistantMessage(resultMessage);
+                    chatHistory.AddFunctionMessage(resultMessage, OpenAIFunction.BuildFullyQualifiedName( functionResponse.PluginName, functionResponse.FunctionName));
                 }
             }
             else
