@@ -1,0 +1,17 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "ModelContextProtocolPlugin",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/ModelContextProtocolPlugin/bin/Debug/net8.0/ModelContextProtocolPlugin.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/ModelContextProtocolPlugin",
+            "console": "internalConsole",
+            "stopAtEntry": false,
+            "internalConsoleOptions": "openOnSessionStart"
+        }
+    ]
+}
