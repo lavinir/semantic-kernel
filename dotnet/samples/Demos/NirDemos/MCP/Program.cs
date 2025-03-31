@@ -31,21 +31,6 @@ if (string.IsNullOrEmpty(config["AzureOpenAI:DeploymentName"]))
     return;
 }
 
-// Create an MCPClient for the GitHub server
-// await using var mcpClient = await McpClientFactory.CreateAsync(
-//     new()
-//     {
-//         Id = "github",
-//         Name = "GitHub",
-//         TransportType = "stdio",
-//         TransportOptions = new Dictionary<string, string>
-//         {
-//             ["command"] = "npx",
-//             ["arguments"] = "-y @modelcontextprotocol/server-github",
-//         }
-//     },
-//     new() { ClientInfo = new() { Name = "GitHub", Version = "1.0.0" } }).ConfigureAwait(false);
-
 await using var mcpClient = await McpClientFactory.CreateAsync(
     new()
     {
@@ -90,7 +75,33 @@ OpenAIPromptExecutionSettings executionSettings = new()
     FunctionChoiceBehavior = FunctionChoiceBehavior.Auto(options: new() { RetainArgumentTypes = true })
 };
 
-// Test using GitHub tools
-var prompt = "Pause the music";
-var result = await kernel.InvokePromptAsync(prompt, new(executionSettings)).ConfigureAwait(false);
-Console.WriteLine($"\n\n{prompt}\n{result}");
+// Interactive loop for user prompts
+Console.WriteLine("\nSpotify Command Interface - Type 'exit' to quit");
+Console.WriteLine("-------------------------------------------");
+
+while (true)
+{
+    Console.Write("\nEnter your command: ");
+    string? prompt = Console.ReadLine();
+
+    if (string.IsNullOrWhiteSpace(prompt))
+    {
+        continue;
+    }
+
+    if (prompt.Equals("exit", StringComparison.OrdinalIgnoreCase))
+    {
+        Console.WriteLine("Exiting...");
+        break;
+    }
+
+    try
+    {
+        var result = await kernel.InvokePromptAsync(prompt, new(executionSettings)).ConfigureAwait(false);
+        Console.WriteLine($"\nResult: {result}");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"\nError: {ex.Message}");
+    }
+}

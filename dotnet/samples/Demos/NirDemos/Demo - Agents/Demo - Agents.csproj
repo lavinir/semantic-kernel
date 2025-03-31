@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <RootNamespace>Demo___Agents</RootNamespace>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <NoWarn>SKEXP0110</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup><!--<ProjectReference Include="..\..\..\..\src\Connectors\Connectors.AzureOpenAI\Connectors.AzureOpenAI.csproj" />
+    <ProjectReference Include="..\..\..\..\src\SemanticKernel.Abstractions\SemanticKernel.Abstractions.csproj" />
+    <ProjectReference Include="..\..\..\..\src\SemanticKernel.Core\SemanticKernel.Core.csproj" />
+    <ProjectReference Include="..\..\..\..\src\Agents\AzureAI\Agents.AzureAI.csproj" />
+    <ProjectReference Include="..\..\..\..\src\Agents\Core\Agents.Core.csproj" />
+    <ProjectReference Include="..\..\..\..\src\Agents\OpenAI\Agents.OpenAI.csproj" />
+    <ProjectReference Include="..\..\..\..\src\Functions\Functions.Yaml\Functions.Yaml.csproj" />-->
+  
+    <PackageReference Include="Azure.Identity" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" />
+    <PackageReference Include="Microsoft.SemanticKernel.Agents.Core" />
+    <PackageReference Include="Microsoft.SemanticKernel.Connectors.AzureOpenAI" />
+    <PackageReference Include="Microsoft.SemanticKernel.Connectors.OpenAI" />
+  </ItemGroup>
+
+</Project>
