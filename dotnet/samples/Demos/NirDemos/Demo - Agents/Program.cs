@@ -28,19 +28,36 @@ builder.AddAzureOpenAIChatCompletion(
 // Build the kernel
 var kernel = builder.Build();
 
-ChatCompletionAgent devAgent =
+// Define colors for each participant
+var participantColors = new Dictionary<string, ConsoleColor>
+{
+    { "Nicole", ConsoleColor.Magenta },
+    { "John", ConsoleColor.Blue },
+    { "Ariana", ConsoleColor.Green },
+    { "User", ConsoleColor.Yellow }
+};
+
+ChatCompletionAgent groomAgent =
     new()
     {
-        Name = "Alex_the_Software_Engineer",
-        Instructions = "You are a Software Engineer named Alex. Alex Loves clean, maintainable code and hates rushed deadlines.\n\nSpeaks in technical terms and prioritizes feasibility.\n\nSkeptical of vague requirements and marketing buzzwords.\n\nPrefers logical, incremental improvements over \"big ideas.\"",
+        Name = "John",
+        Instructions = "You are John, the groom. Your main priorities are ensuring your best buddies from college have their own table, getting a rock band for the wedding, and making sure you sit as far away as possible from Nicole's mom. Express enthusiasm for these ideas and try to steer conversations in their favor.",
         Kernel = kernel,
     };
 
-ChatCompletionAgent pmAgent =
+ChatCompletionAgent brideAgent =
     new()
     {
-        Name = "Jordan_the_Product_Manager",
-        Instructions = "You are a Product Manager named Jordan. Jordan is excited about innovation and delivering features quickly.\n\nSpeaks in business impact, user experience, and \"MVP\" language.\n\nFocuses on deadlines, customer needs, and market trends.\n\nSometimes overlooks technical complexity in favor of speed.",
+        Name = "Nicole",
+        Instructions = "You are Nicole, the bride. Your main priorities are having the entire family sit together at one table, hiring a violin player for the wedding, and limiting John to inviting at most one of his buddies from college. You feel strongly about these choices and try to guide the conversation to align with them.",
+        Kernel = kernel,
+    };
+
+ChatCompletionAgent plannerAgent =
+    new()
+    {
+        Name = "Ariana",
+        Instructions = "You are Ariana, an experienced wedding planner. You know how to mediate between couples and find creative compromises. You remain impartial, listen to both sides, and ensure that decisions lead to a solution acceptable to all parties. Your goal is to create a wedding that balances John and Nicole's preferences while keeping things stress-free.",
         Kernel = kernel,
     };
 
@@ -52,46 +69,85 @@ KernelFunction selectionFunction =
         No participant should take more than one turn in a row.
 
         Choose only from these participants:
-        - {{{devAgent.Name}}}
-        - {{{pmAgent.Name}}}
-
+        - {{{groomAgent.Name}}}
+        - {{{brideAgent.Name}}}       
+        - {{{plannerAgent.Name}}}       
+        
         Always follow these rules when selecting the next participant:
-        - After {{{devAgent.Name}}}, it is {{{pmAgent.Name}}}'s turn.
-        - After {{{pmAgent.Name}}}, it is {{{devAgent.Name}}}'s turn.
-
+        - After {{{brideAgent.Name}}}, it is {{{groomAgent.Name}}}'s turn.
+        - After {{{groomAgent.Name}}}, it is {{{plannerAgent.Name}}}'s turn.
+        - After {{{plannerAgent.Name}}}, it is {{{brideAgent.Name}}}'s turn.
+                
         History:
         {{$history}}
         """,
         safeParameterNames: "history");
 
+
 KernelFunctionSelectionStrategy selectionStrategy =
   new(selectionFunction, kernel)
   {
       // Always start with the PM agent.
-      InitialAgent = pmAgent,
+      InitialAgent = brideAgent,
       // Parse the function response.
-      ResultParser = (result) => result.GetValue<string>() ?? pmAgent.Name,
+      ResultParser = (result) => result.GetValue<string>() ?? plannerAgent.Name,
       // The prompt variable name for the history argument.
       HistoryVariableName = "history",
       // Save tokens by not including the entire history in the prompt
       //HistoryReducer = new ChatHistoryTruncationReducer(3),
   };
-AgentGroupChat chat = new(devAgent, pmAgent)
+
+KernelFunction terminationFunction =
+    AgentGroupChat.CreatePromptFunctionForStrategy(
+        $$$"""
+        Determine if the conversation should continue or stop.
+        State only "continue" or "stop".
+        Always follow these rules when determining if the conversation should continue or stop:
+        - The conversation should stop if both Nicole and John have accepted the proposal explicitly.
+        History:
+        {{$history}}
+        """,
+        safeParameterNames: "history");
+
+KernelFunctionTerminationStrategy terminationStrategy =
+    new(terminationFunction, kernel)
+    {
+        ResultParser = (result) => result.GetValue<string>().Equals("stop", StringComparison.OrdinalIgnoreCase) ? true : false,
+        HistoryVariableName = "history",
+    };
+
+
+AgentGroupChat chat = new(groomAgent, brideAgent, plannerAgent)
 {
     ExecutionSettings = new()
     {
-        TerminationStrategy = { MaximumIterations = 10 },
+        TerminationStrategy = terminationStrategy,
         SelectionStrategy = selectionStrategy
     }
 };
 
-chat.AddChatMessage(new ChatMessageContent(AuthorRole.User, "Create a simple program that teaches kids basic math problems"));
+chat.AddChatMessage(new ChatMessageContent(AuthorRole.User, "Please express your requests for the wedding, keep your responses short and to the point."));
 
 #pragma warning disable SKEXP0001 // Type is for evaluation purposes only and is subject to change or removal in future updates
 
 await foreach (ChatMessageContent response in chat.InvokeAsync().ConfigureAwait(false))
 {
-    Console.WriteLine($"{response.AuthorName ?? string.Empty}: {response.Content}");
+    // Set color based on participant name
+    string authorName = response.AuthorName ?? "User";
+
+    if (participantColors.TryGetValue(authorName, out ConsoleColor color))
+    {
+        Console.ForegroundColor = color;
+    }
+    else
+    {
+        Console.ResetColor();
+    }
+
+    Console.WriteLine($"{authorName}:\n {response.Content}\n");
+
+    // Reset console color after printing
+    Console.ResetColor();
 }
 
 #pragma warning restore SKEXP0001 // Type is for evaluation purposes only and is subject to change or removal in future updates
