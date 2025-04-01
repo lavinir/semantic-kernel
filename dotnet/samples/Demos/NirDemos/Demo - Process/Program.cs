@@ -1,5 +1,6 @@
 ﻿// Create the process builder
 using Azure.Identity;
+using Demo.Process;
 using Microsoft.Extensions.Configuration;
 using Microsoft.SemanticKernel;
 
@@ -45,4 +46,4 @@ docsGenerationStep
 
 // Build and run the process
 var process = processBuilder.Build();
-await process.StartAsync(kernel, new KernelProcessEvent { Id = "Start", Data = "Contoso GlowBrew" }).ConfigureAwait(false);
+await process.StartAsync(kernel, new KernelProcessEvent { Id = "Start", Data = "Central Perk" }).ConfigureAwait(false);
