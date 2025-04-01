@@ -66,7 +66,7 @@ builder.Services
         endpoint: config["AzureOpenAI:Endpoint"],
         credentials: new DefaultAzureCredential());
 Kernel kernel = builder.Build();
-kernel.Plugins.AddFromFunctions("GitHub", tools.Select(aiFunction => aiFunction.AsKernelFunction()));
+kernel.Plugins.AddFromFunctions("Spotify", tools.Select(aiFunction => aiFunction.AsKernelFunction()));
 
 // Enable automatic function calling
 OpenAIPromptExecutionSettings executionSettings = new()

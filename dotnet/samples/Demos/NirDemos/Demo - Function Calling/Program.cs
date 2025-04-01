@@ -108,7 +108,8 @@ static async Task RunTimePluginDemoAsync(Kernel kernel)
         {
             "What time is it now?",
             "What's today's date?",
-            "Can you tell me the current time and date?"
+            "Can you tell me the current time and date?",
+            "What is the time in London?"
         };
 
         foreach (var prompt in prompts)

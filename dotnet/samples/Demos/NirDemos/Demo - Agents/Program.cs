@@ -34,7 +34,6 @@ var participantColors = new Dictionary<string, ConsoleColor>
     { "Nicole", ConsoleColor.Magenta },
     { "John", ConsoleColor.Blue },
     { "Ariana", ConsoleColor.Green },
-    { "User", ConsoleColor.Yellow }
 };
 
 ChatCompletionAgent groomAgent =
